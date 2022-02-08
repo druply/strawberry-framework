@@ -1,0 +1,39 @@
+{
+    "taskinit": {
+        "call" : "pi4.InitEcua",
+        "header" : "Ecua.hpp"
+        
+    },
+    "rt-tasks": [
+        {
+            "task0" : "usonicsDrv",
+            "rate" :  "20"            
+        },
+        {
+            "task0" : "encodersDrv",
+            "rate" :  "20"            
+        },
+        {
+            "task0" : "tcpDrv",
+            "rate" :  "20"            
+        },
+        {
+            "task0" : "lidarDrv",
+            "rate" :  "20"            
+        },
+        {
+            "task0" : "cameraDrv",
+            "rate" :  "20"            
+        },
+        {
+            "task0" : "app_swc1",
+            "rate" :  "20"            
+        }
+    ],
+    "nrt-tasks": [
+        {
+            "task0" : "lidarDrv"            
+
+        }
+    ]
+}
