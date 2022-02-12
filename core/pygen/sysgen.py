@@ -26,6 +26,10 @@ def init_task(tasks):
     cpp_file_body += ' */\n'
     cpp_file_body += 'void SystemInitTasks(void) {\n'    
     cpp_file_body += '  ' + tasks['taskinit']['call'] +'();\n' 
+    cpp_file_body += '#ifdef ENABLE_SYS_TIMER\n'
+    cpp_file_body += 'time_elapsed = 0;\n'
+    cpp_file_body += 'max_time_elapsed = 0;\n'
+    cpp_file_body += '#endif //ENABLE_SYS_TIMER\n'
     cpp_file_body += '}\n'
     cpp_file_body += '\n'
     cpp_file_body += '\n'
@@ -69,7 +73,7 @@ def rt_tasks(tasks):
 
     cpp_file_body += '/**\n'
     cpp_file_body += ' * Task 0 task\n'
-    cpp_file_body += ' * execute every 10ms to get a real time execution\n'
+    cpp_file_body += ' * execute every cycle to get a real time execution\n'
     cpp_file_body += ' */\n'
     cpp_file_body += 'void SystemTask0(void) {\n'
     cpp_file_body += '\n'
@@ -78,44 +82,44 @@ def rt_tasks(tasks):
     cpp_file_body += '#ifdef ENABLE_SYS_TIMER\n'
     cpp_file_body += '   UpdateTimer(&tmr1);\n'
     cpp_file_body += '#endif //ENABLE_SYS_TIMER\n'
-    cpp_file_body += '   // 10ms calls go here\n'
+    cpp_file_body += '   // 1x calls go here\n'
     #10ms calls
     #########  10ms calls
     for x in range(length):
         if('task0' in tasks['rt-tasks'][x]):                                    
-            if(tasks['rt-tasks'][x]['rate'] == '10'):
+            if(tasks['rt-tasks'][x]['rate'] == '1'):
                 cpp_file_body += '   ' + tasks['rt-tasks'][x]['task0'] + '();\n'                                  
     ############################
     cpp_file_body += '\n'
     # 20 ms calls
     cpp_file_body += '   if ((thread0_ctr % 2) == 0) {\n'
-    cpp_file_body += '       // 20ms calls go here\n'
+    cpp_file_body += '       // 2x calls go here\n'
     #########  20ms calls
     for x in range(length):
         if('task0' in tasks['rt-tasks'][x]):                                    
-            if(tasks['rt-tasks'][x]['rate'] == '20'):
+            if(tasks['rt-tasks'][x]['rate'] == '2'):
                 cpp_file_body += '   ' + tasks['rt-tasks'][x]['task0'] + '();\n'                                  
     ############################
     cpp_file_body += '   }\n' 
     cpp_file_body += '\n'
     # 100 ms calls
     cpp_file_body += '    if (((thread0_ctr - 2) % 10) == 0) {\n'
-    cpp_file_body += '       // 100ms calls go here\n'
+    cpp_file_body += '       // 10x calls go here\n'
     #########  100ms calls
     for x in range(length):
         if('task0' in tasks['rt-tasks'][x]):                                    
-            if(tasks['rt-tasks'][x]['rate'] == '100'):
+            if(tasks['rt-tasks'][x]['rate'] == '10'):
                 cpp_file_body += '   ' + tasks['rt-tasks'][x]['task0'] + '();\n'                                  
     ############################
     cpp_file_body += '   }\n' 
     cpp_file_body += '\n'
     # 1000 ms calls
     cpp_file_body += '    if (((thread0_ctr - 3) % 100) == 0) {\n'
-    cpp_file_body += '       // 1000ms calls go here\n'
+    cpp_file_body += '       // 100x calls go here\n'
     #########  1000ms calls
     for x in range(length):
         if('task0' in tasks['rt-tasks'][x]):                                    
-            if(tasks['rt-tasks'][x]['rate'] == '1000'):
+            if(tasks['rt-tasks'][x]['rate'] == '100'):
                 cpp_file_body += '   ' + tasks['rt-tasks'][x]['task0'] + '();\n'                                  
     ############################
     cpp_file_body += '   }\n'     
@@ -132,7 +136,11 @@ def rt_tasks(tasks):
     cpp_file_body += '#ifdef ENABLE_SYS_TIMER\n'
     cpp_file_body += '   UpdateTimer(&tmr2);\n'    
     cpp_file_body += '   time_elapsed = GetTimeElapsedUs(&tmr1, &tmr2);\n'
+    cpp_file_body += '   if (time_elapsed > max_time_elapsed) {\n'
+    cpp_file_body += '      max_time_elapsed = time_elapsed;\n'
+    cpp_file_body += '   }\n'
     cpp_file_body += '   DebugLog(time_elapsed, "total time in micros: ");\n'
+    cpp_file_body += '   DebugLog(max_time_elapsed, "max time elapsed: ");\n'
     cpp_file_body += '#endif //ENABLE_SYS_TIMER\n'
     cpp_file_body += '\n'
     cpp_file_body += '}\n'
@@ -144,28 +152,28 @@ def rt_tasks(tasks):
         ### Task1 ############    
         cpp_file_body += '/**\n'
         cpp_file_body += ' * Task 1 task\n'
-        cpp_file_body += ' * execute every 10ms to get a real time execution\n'
+        cpp_file_body += ' * execute every cycle to get a real time execution\n'
         cpp_file_body += ' */\n'
         cpp_file_body += 'void SystemTask1(void) {\n'
         cpp_file_body += '\n'
         cpp_file_body += '\n'
         cpp_file_body += '   static uint16_t thread1_ctr;\n'
-        cpp_file_body += '   // 10ms calls go here\n'
+        cpp_file_body += '   // 1x calls go here\n'
         
         #########  10ms calls
         for x in range(length):
             if('task1' in tasks['rt-tasks'][x]):                                    
-                if(tasks['rt-tasks'][x]['rate'] == '10'):
+                if(tasks['rt-tasks'][x]['rate'] == '1'):
                     cpp_file_body += '   ' + tasks['rt-tasks'][x]['task1'] + '();\n'                                  
         ############################
         
         cpp_file_body += '\n'    
         cpp_file_body += '   if ((thread1_ctr % 2) == 0) {\n'
-        cpp_file_body += '       // 20ms calls go here\n'    
+        cpp_file_body += '       // 2x calls go here\n'    
         ##### 20 ms calls
         for x in range(length):
             if('task1' in tasks['rt-tasks'][x]):                                    
-                if(tasks['rt-tasks'][x]['rate'] == '20'):
+                if(tasks['rt-tasks'][x]['rate'] == '2'):
                     cpp_file_body += '   ' + tasks['rt-tasks'][x]['task1'] + '();\n'                  
         
         cpp_file_body += '   }\n'
@@ -173,12 +181,12 @@ def rt_tasks(tasks):
         
         cpp_file_body += '\n'    
         cpp_file_body += '   if (((thread1_ctr - 1) % 5) == 0)  {\n'
-        cpp_file_body += '       // 50ms calls go here\n'
+        cpp_file_body += '       // 5x calls go here\n'
         
         ##### 50 ms calls
         for x in range(length):
             if('task1' in tasks['rt-tasks'][x]):                                    
-                if(tasks['rt-tasks'][x]['rate'] == '50'):
+                if(tasks['rt-tasks'][x]['rate'] == '5'):
                     cpp_file_body += '   ' + tasks['rt-tasks'][x]['task1'] + '();\n'                     
         
         cpp_file_body += '   }\n'    
@@ -186,11 +194,11 @@ def rt_tasks(tasks):
     
         cpp_file_body += '\n'    
         cpp_file_body += '    if (((thread1_ctr - 2) % 10) == 0) {\n'
-        cpp_file_body += '       // 100ms calls go here\n'    
+        cpp_file_body += '       // 10x calls go here\n'    
         ##### 100 ms calls
         for x in range(length):
             if('task1' in tasks['rt-tasks'][x]):                                    
-                if(tasks['rt-tasks'][x]['rate'] == '100'):
+                if(tasks['rt-tasks'][x]['rate'] == '10'):
                     cpp_file_body += '   ' + tasks['rt-tasks'][x]['task1'] + '();\n'                     
         
         cpp_file_body += '   }\n'
@@ -198,11 +206,11 @@ def rt_tasks(tasks):
         
         cpp_file_body += '\n'    
         cpp_file_body += '    if (((thread1_ctr - 3) % 100) == 0) {\n'
-        cpp_file_body += '       // 1000ms calls go here\n'    
+        cpp_file_body += '       // 100x calls go here\n'    
         ##### 1000 ms calls
         for x in range(length):
             if('task1' in tasks['rt-tasks'][x]):                                    
-                if(tasks['rt-tasks'][x]['rate'] == '1000'):
+                if(tasks['rt-tasks'][x]['rate'] == '100'):
                     cpp_file_body += '   ' + tasks['rt-tasks'][x]['task1'] + '();\n'                     
         
         cpp_file_body += '   }\n'    
@@ -231,42 +239,42 @@ def rt_tasks(tasks):
         cpp_file_body += '\n'
         cpp_file_body += '\n'
         cpp_file_body += '   static uint16_t thread2_ctr;\n'
-        cpp_file_body += '   // 10ms calls go here\n'    
+        cpp_file_body += '   // 1x calls go here\n'    
         #########  10ms calls
         for x in range(length):
             if('task2' in tasks['rt-tasks'][x]):                                    
-                if(tasks['rt-tasks'][x]['rate'] == '10'):
+                if(tasks['rt-tasks'][x]['rate'] == '1'):
                     cpp_file_body += '   ' + tasks['rt-tasks'][x]['task2'] + '();\n'                                  
         ############################    
         cpp_file_body += '\n'    
         cpp_file_body += '   if ((thread2_ctr % 2) == 0) {\n'
-        cpp_file_body += '       // 20ms calls go here\n'    
+        cpp_file_body += '       // 2x calls go here\n'    
         ##### 20 ms calls
         for x in range(length):
             if('task2' in tasks['rt-tasks'][x]):                                    
-                if(tasks['rt-tasks'][x]['rate'] == '20'):
+                if(tasks['rt-tasks'][x]['rate'] == '2'):
                     cpp_file_body += '   ' + tasks['rt-tasks'][x]['task2'] + '();\n'                  
         
         cpp_file_body += '   }\n'
         ###########################    
         cpp_file_body += '\n'    
         cpp_file_body += '   if (((thread2_ctr - 1) % 5) == 0)  {\n'
-        cpp_file_body += '       // 50ms calls go here\n'    
+        cpp_file_body += '       // 5x calls go here\n'    
         ##### 50 ms calls
         for x in range(length):
             if('task2' in tasks['rt-tasks'][x]):                                    
-                if(tasks['rt-tasks'][x]['rate'] == '50'):
+                if(tasks['rt-tasks'][x]['rate'] == '5'):
                     cpp_file_body += '   ' + tasks['rt-tasks'][x]['task2'] + '();\n'                     
         
         cpp_file_body += '   }\n'    
         ###########################
         cpp_file_body += '\n'    
         cpp_file_body += '    if (((thread2_ctr - 2) % 10) == 0) {\n'
-        cpp_file_body += '       // 100ms calls go here\n'    
+        cpp_file_body += '       // 10x calls go here\n'    
         ##### 100 ms calls
         for x in range(length):
             if('task2' in tasks['rt-tasks'][x]):                                    
-                if(tasks['rt-tasks'][x]['rate'] == '100'):
+                if(tasks['rt-tasks'][x]['rate'] == '10'):
                     cpp_file_body += '   ' + tasks['rt-tasks'][x]['task2'] + '();\n'                     
         
         cpp_file_body += '   }\n'
@@ -274,11 +282,11 @@ def rt_tasks(tasks):
         
         cpp_file_body += '\n'    
         cpp_file_body += '    if (((thread2_ctr - 3) % 100) == 0) {\n'
-        cpp_file_body += '       // 1000ms calls go here\n'    
+        cpp_file_body += '       // 100x calls go here\n'    
         ##### 1000 ms calls
         for x in range(length):
             if('task2' in tasks['rt-tasks'][x]):                                    
-                if(tasks['rt-tasks'][x]['rate'] == '1000'):
+                if(tasks['rt-tasks'][x]['rate'] == '100'):
                     cpp_file_body += '   ' + tasks['rt-tasks'][x]['task2'] + '();\n'                     
         
         cpp_file_body += '   }\n'    
@@ -301,28 +309,28 @@ def rt_tasks(tasks):
         ### Task3 ############    
         cpp_file_body += '/**\n'
         cpp_file_body += ' * Task 3 task\n'
-        cpp_file_body += ' * execute every 10ms to get a real time execution\n'
+        cpp_file_body += ' * execute every cycle to get a real time execution\n'
         cpp_file_body += ' */\n'
         cpp_file_body += 'void SystemTask3(void) {\n'
         cpp_file_body += '\n'
         cpp_file_body += '\n'
         cpp_file_body += '   static uint16_t thread3_ctr;\n'
-        cpp_file_body += '   // 10ms calls go here\n'
+        cpp_file_body += '   // 1x calls go here\n'
         
         #########  10ms calls
         for x in range(length):
             if('task3' in tasks['rt-tasks'][x]):                                    
-                if(tasks['rt-tasks'][x]['rate'] == '10'):
+                if(tasks['rt-tasks'][x]['rate'] == '1'):
                     cpp_file_body += '   ' + tasks['rt-tasks'][x]['task3'] + '();\n'                                  
         ############################
         
         cpp_file_body += '\n'    
         cpp_file_body += '   if ((thread3_ctr % 2) == 0) {\n'
-        cpp_file_body += '       // 20ms calls go here\n'    
+        cpp_file_body += '       // 2x calls go here\n'    
         ##### 20 ms calls
         for x in range(length):
             if('task3' in tasks['rt-tasks'][x]):                                    
-                if(tasks['rt-tasks'][x]['rate'] == '20'):
+                if(tasks['rt-tasks'][x]['rate'] == '2'):
                     cpp_file_body += '   ' + tasks['rt-tasks'][x]['task3'] + '();\n'                  
         
         cpp_file_body += '   }\n'
@@ -330,12 +338,12 @@ def rt_tasks(tasks):
         
         cpp_file_body += '\n'    
         cpp_file_body += '   if (((thread3_ctr - 1) % 5) == 0)  {\n'
-        cpp_file_body += '       // 50ms calls go here\n'
+        cpp_file_body += '       // 5x calls go here\n'
         
         ##### 50 ms calls
         for x in range(length):
             if('task3' in tasks['rt-tasks'][x]):                                    
-                if(tasks['rt-tasks'][x]['rate'] == '50'):
+                if(tasks['rt-tasks'][x]['rate'] == '5'):
                     cpp_file_body += '   ' + tasks['rt-tasks'][x]['task3'] + '();\n'                     
         
         cpp_file_body += '   }\n'    
@@ -343,11 +351,11 @@ def rt_tasks(tasks):
     
         cpp_file_body += '\n'    
         cpp_file_body += '    if (((thread3_ctr - 2) % 10) == 0) {\n'
-        cpp_file_body += '       // 100ms calls go here\n'    
+        cpp_file_body += '       // 10x calls go here\n'    
         ##### 100 ms calls
         for x in range(length):
             if('task3' in tasks['rt-tasks'][x]):                                    
-                if(tasks['rt-tasks'][x]['rate'] == '100'):
+                if(tasks['rt-tasks'][x]['rate'] == '10'):
                     cpp_file_body += '   ' + tasks['rt-tasks'][x]['task3'] + '();\n'                     
         
         cpp_file_body += '   }\n'
@@ -355,11 +363,11 @@ def rt_tasks(tasks):
         
         cpp_file_body += '\n'    
         cpp_file_body += '    if (((thread3_ctr - 3) % 100) == 0) {\n'
-        cpp_file_body += '       // 1000ms calls go here\n'    
+        cpp_file_body += '       // 100x calls go here\n'    
         ##### 1000 ms calls
         for x in range(length):
             if('task3' in tasks['rt-tasks'][x]):                                    
-                if(tasks['rt-tasks'][x]['rate'] == '1000'):
+                if(tasks['rt-tasks'][x]['rate'] == '100'):
                     cpp_file_body += '   ' + tasks['rt-tasks'][x]['task3'] + '();\n'                     
         
         cpp_file_body += '   }\n'    
@@ -382,29 +390,29 @@ def rt_tasks(tasks):
         ### Task4 ############    
         cpp_file_body += '/**\n'
         cpp_file_body += ' * Task 4 task\n'
-        cpp_file_body += ' * execute every 10ms to get a real time execution\n'
+        cpp_file_body += ' * execute every cycle to get a real time execution\n'
         cpp_file_body += ' */\n'
         cpp_file_body += 'void SystemTask4(void) {\n'
         cpp_file_body += '\n'
         cpp_file_body += '\n'
         cpp_file_body += '   static uint16_t thread4_ctr;\n'
-        cpp_file_body += '   // 10ms calls go here\n'
+        cpp_file_body += '   // 1x calls go here\n'
         
         #########  10ms calls
         for x in range(length):
             if('task4' in tasks['rt-tasks'][x]):                                    
-                if(tasks['rt-tasks'][x]['rate'] == '10'):
+                if(tasks['rt-tasks'][x]['rate'] == '1'):
                     cpp_file_body += '   ' + tasks['rt-tasks'][x]['task4'] + '();\n'                                  
         ############################
         
         cpp_file_body += '\n'    
         cpp_file_body += '   if ((thread4_ctr % 2) == 0) {\n'
-        cpp_file_body += '       // 20ms calls go here\n'    
+        cpp_file_body += '       // 2x calls go here\n'    
         
         ##### 20 ms calls
         for x in range(length):
             if('task4' in tasks['rt-tasks'][x]):                                    
-                if(tasks['rt-tasks'][x]['rate'] == '20'):
+                if(tasks['rt-tasks'][x]['rate'] == '2'):
                     cpp_file_body += '   ' + tasks['rt-tasks'][x]['task4'] + '();\n'                  
         
         cpp_file_body += '   }\n'
@@ -412,12 +420,12 @@ def rt_tasks(tasks):
         
         cpp_file_body += '\n'    
         cpp_file_body += '   if (((thread4_ctr - 1) % 5) == 0)  {\n'
-        cpp_file_body += '       // 50ms calls go here\n'
+        cpp_file_body += '       // 5x calls go here\n'
         
         ##### 50 ms calls
         for x in range(length):
             if('task4' in tasks['rt-tasks'][x]):                                    
-                if(tasks['rt-tasks'][x]['rate'] == '50'):
+                if(tasks['rt-tasks'][x]['rate'] == '5'):
                     cpp_file_body += '   ' + tasks['rt-tasks'][x]['task4'] + '();\n'                     
         
         cpp_file_body += '   }\n'
@@ -426,12 +434,12 @@ def rt_tasks(tasks):
     
         cpp_file_body += '\n'    
         cpp_file_body += '    if (((thread4_ctr - 2) % 10) == 0) {\n'
-        cpp_file_body += '       // 100ms calls go here\n'
+        cpp_file_body += '       // 10x calls go here\n'
         
         ##### 100 ms calls
         for x in range(length):
             if('task4' in tasks['rt-tasks'][x]):                                    
-                if(tasks['rt-tasks'][x]['rate'] == '100'):
+                if(tasks['rt-tasks'][x]['rate'] == '10'):
                     cpp_file_body += '   ' + tasks['rt-tasks'][x]['task4'] + '();\n'                     
         
         cpp_file_body += '   }\n'
@@ -441,11 +449,11 @@ def rt_tasks(tasks):
         
         cpp_file_body += '\n'    
         cpp_file_body += '    if (((thread4_ctr - 3) % 100) == 0) {\n'
-        cpp_file_body += '       // 1000ms calls go here\n'    
+        cpp_file_body += '       // 100x calls go here\n'    
         ##### 1000 ms calls
         for x in range(length):
             if('task4' in tasks['rt-tasks'][x]):                                    
-                if(tasks['rt-tasks'][x]['rate'] == '1000'):
+                if(tasks['rt-tasks'][x]['rate'] == '100'):
                     cpp_file_body += '   ' + tasks['rt-tasks'][x]['task4'] + '();\n'                     
         
         cpp_file_body += '   }\n'    
@@ -471,7 +479,10 @@ def nrt_tasks(tasks):
     global hpp_file_body
     global cpp_file_body
 
-    length = len(tasks['nrt-tasks'])   
+    if('tasnrt-tasksk0' in tasks): 
+        length = len(tasks['nrt-tasks'])   
+    else:
+        return 0
 
     #check if there is nrt-tasks function if not then return 
     if tasks['nrt-tasks'] == '':
@@ -532,10 +543,12 @@ if __name__=="__main__":
 
     # Opening JSON file
     f = open('../../tasks.json',"r")
-    #start hpp file
+    # start hpp file
     hpp_file_body += '#ifndef SYSTASKS_HPP_\n'
     hpp_file_body += '#define SYSTASKS_HPP_\n'
     hpp_file_body += '\n'    
+    hpp_file_body += '#include "sys_config.hpp"\n'    
+    
 
     jsonContent = f.read()
     tasks = json.loads(jsonContent)
@@ -561,7 +574,7 @@ if __name__=="__main__":
     cpp_file_body += '\n'
     cpp_file_body += '#ifdef ENABLE_SYS_TIMER\n'
     cpp_file_body += 'struct timespec tmr1, tmr2;\n'    
-    cpp_file_body += 'double time_elapsed;\n'
+    cpp_file_body += 'double time_elapsed, max_time_elapsed;\n'
     cpp_file_body += '#endif //ENABLE_SYS_TIMER\n'
     cpp_file_body += '\n'
 

@@ -13,6 +13,9 @@ rte_output_swc1: output writing, this funciton can be used to write output to yo
 app_swc1: this is the main funciton for your app
 app_swc1_deinit: this function is called when the system is deinitialized
 
+You are welcome to add more app source files, just make sure the source files are inside the app/src folder.
+and specify your prototype functions inside the app/inc/app_swc.hpp file.
+
 
 add code to device/ folder
 In this folder you can add your drivers and services for the application you are developing
@@ -20,6 +23,38 @@ In this folder you can add your drivers and services for the application you are
 
 ##Configuring project
 
+**taskinit** specifies the function that initialized your system, specify the name of your funciton the "call" and the header where it is located in "header" ad shown in the example.
+
+"taskinit": {
+    "call" : "InitEcu",
+    "header" : "Ecu.hpp"
+        
+},
+    
+**rt-tasks** specifies the real time tasks, specify the number of the task, the name and the rate
+The following example defines two tasks task0 and task1 that will run in two different threads.
+**task0** contains two functions that will be called, "usonicsDrv" will be called every 1x the base time, "encodersDrv" will be called every 2x the base time
+**task1** contains two functions that will be called, "lidarDrv" will be called every 2x the base time, "cameraDrv" will be called every 5x the base time
+
+"rt-tasks": [
+    {
+        "task0" : "usonicsDrv",
+        "rate" :  "1"            
+    },
+    {
+        "task0" : "encodersDrv",
+        "rate" :  "2"            
+    },
+    {
+        "task1" : "lidarDrv",
+        "rate" :  "2"            
+    },
+    {
+        "task1" : "cameraDrv",
+        "rate" :  "5"            
+    }
+]
+    
 ##to generate project:
 
 **Execute the command**
