@@ -27,7 +27,7 @@ void rte_output_swc1(void) {
 	//output1[index_ctr] = 5;
 }
 
-void app_swc1(void) {
+void AppSwc1(void) {
 	
     
     // read inputs from rte

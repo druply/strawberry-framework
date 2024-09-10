@@ -15,7 +15,7 @@
 #include "sys_config.hpp"
 
 //declare system state
-system_state_T sys_state = sys_INIT;
+system_state_T sys_state = sys_INACTIVE;
 //fault warning variable, used to count faults in the system
 static int warning_fault_ctr;
 
@@ -37,7 +37,7 @@ void SystemInit(void) {
 	SystemInitTasks();
 
 	// change OS state
-	sys_state = sys_RUNNING;
+	sys_state = sys_INIT;
 }
 
 /**

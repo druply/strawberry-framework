@@ -15,7 +15,7 @@
 #include "sys_config.hpp"
 
 //declare system state
-system_state_T sys_state = sys_INIT;
+system_state_T sys_state = sys_INACTIVE;
 //fault warning variable, used to count faults in the system
 static int warning_fault_ctr;
 
@@ -37,7 +37,7 @@ void SystemInit(void) {
 	SystemInitTasks();
 
 	// change OS state
-	sys_state = sys_RUNNING;
+	sys_state = sys_INIT;
 }
 
 /**
@@ -45,6 +45,7 @@ void SystemInit(void) {
  */
 void SystemStart(void) {
 
+	sys_state = sys_RUNNING;
 
 	SystemLog("Starting OS");
     // start OS
@@ -69,8 +70,7 @@ void SetSystemException(system_exception_T exception) {
 		sys_state = sys_STOP;
 	}
 
-	if(exception == sys_Taskdelayed) {
-        
+	if(exception == sys_Taskdelayed) {        
         warning_fault_ctr++;
 		SystemLog("task delayed");
 	}
@@ -80,6 +80,10 @@ void SetSystemException(system_exception_T exception) {
 		SystemLog("Restarting system");
 	}
 
+	if(exception == sys_Halt) {
+		SystemLog("system halt");
+		sys_state = sys_STOP;
+	}
 
 }
 
@@ -110,7 +114,9 @@ void SystemMonitor(void) {
  * De-Initialize OS
  */
 void SystemDeinit(void) {
-	sys_state = sys_INACTIVE;
+	
+    SystemDeInitTasks();
+    sys_state = sys_INACTIVE;
     SystemLog("Deinitializing system");
 
 }
