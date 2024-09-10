@@ -1,8 +1,8 @@
-#strawberry-framework
+# strawberry-framework
 
 **Strawberry Framework** is a tool that helps you deploy your appplications in ARM processors running linux, especially if you want to run your application in real time in a raspberry pi for example. This tool is the perfect solution to help you speed up your deployment.
 
-##Adding code to your project
+## Adding code to your project
 
 add code to the app/src/app_swc1.cpp
 This file contains the following:
@@ -21,7 +21,7 @@ add code to device/ folder
 In this folder you can add your drivers and services for the application you are developing
 
 
-##Configuring project
+## Configuring project
 
 **taskinit** specifies the function that initialized your system, specify the name of your funciton the "call" and the header where it is located in "header" ad shown in the example.
 
@@ -55,14 +55,14 @@ The following example defines two tasks task0 and task1 that will run in two dif
     }
 ]
     
-##to generate project:
+## to generate project:
 
 **Execute the command**
 sh generate.sh
 
 This will generate the project using the configuration in the tasks.json file
 
-##to build project:
+## to build project:
 
 mkdir build
 cd build
@@ -71,13 +71,13 @@ make
 ./strawberry
 
 
-##For release code:
+## For release code:
 mkdir Release
 cd Release
 cmake -DCMAKE_BUILD_TYPE=Release ..
 make
 
-##for debug code:
+## for debug code:
 mkdir Debug
 cd Debug
 cmake -DCMAKE_BUILD_TYPE=Debug ..
