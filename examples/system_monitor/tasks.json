@@ -1,33 +1,17 @@
 {
     "taskinit": {
-        "call" : "//pi4.InitEcua",
-        "header" : "sys_tasks.hpp"
+        "call" : "app_swc1_init",
+        "header" : "app_swc.hpp"
         
     },
+    "taskdeinit": {
+        "call" : "app_swc1_deinit",
+        "header" : "app_swc.hpp"
+    }, 
+
     "rt-tasks": [
-        {
-            "task0" : "//usonicsDrv",
-            "rate" :  "2"            
-        },
-        {
-            "task0" : "//encodersDrv",
-            "rate" :  "2"            
-        },
-        {
-            "task0" : "//tcpDrv",
-            "rate" :  "2"            
-        },
-        {
-            "task0" : "//lidarDrv",
-            "rate" :  "2"            
-        },
-        {
-            "task0" : "//cameraDrv",
-            "rate" :  "2"            
-        },
-        {
-            "task0" : "app_swc1",
-            "rate" :  "2"            
-        }
-    ]
+    {
+            "task0" : "AppSwc1",
+            "rate" :  "1"            
+    }]
 }

@@ -2,7 +2,7 @@
     "base-time" : "10",
     
     "sys-logger" : {
-        "debug" : "on",
+        "debug" : "off",
         "system" : "on"
     },
     "sys-timer" : "off"    

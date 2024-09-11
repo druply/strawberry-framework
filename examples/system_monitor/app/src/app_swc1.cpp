@@ -11,10 +11,13 @@
 
 // include your headers here!!
 #include "sys_mon.hpp"
+#include <iostream>
 system_exception_T except;
 
+
 void app_swc1_init(void) {
-	except = sys_OK;
+   except = sys_OK;
+   std::cout << "initializing appswc1" << std::endl;
 }
 
 void rte_input_swc1(void) {
@@ -27,7 +30,7 @@ void rte_output_swc1(void) {
 	//output1[index_ctr] = 5;
 }
 
-void app_swc1(void) {
+void AppSwc1(void) {
 	
     static int ctr = 0, ctr2 = 0;
 	ctr++;
@@ -38,11 +41,12 @@ void app_swc1(void) {
 		ctr = 0;
 		ctr2++;
 
-		if(ctr2 == 10) {
-			except = sys_Taskoverrun;
+		if(ctr2 == 3) {
+			except = sys_Halt;
 			SetSystemException(except);
 		}
 	}
+ 
     // read inputs from rte
 	rte_input_swc1();
 
@@ -53,6 +57,5 @@ void app_swc1(void) {
 
 
 void app_swc1_deinit(void) {
-
-
+   std::cout << "deinitializing app_swc1" << std::endl;
 }

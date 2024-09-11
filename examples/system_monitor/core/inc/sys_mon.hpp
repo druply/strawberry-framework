@@ -21,6 +21,7 @@ typedef enum {
 	sys_Taskdelayed,
 	sys_DrvError,
 	sys_Restart,
+	sys_Halt,
 	sys_OK
 } system_exception_T;
 

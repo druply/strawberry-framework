@@ -18,24 +18,26 @@ int main() {
 	static bool running = true;
 
 	// Initialize system
-	SystemInit();
+	//SystemInit();
+
 	//enter infitine loop while system is running
 	while(running) {
-		//get system state
+		// get system state
 		GetSystemState(&state);
-
-		switch(state) {
-			//choose funciton based on system state
-			case sys_INIT:				
+		//choose funciton based on system state
+		switch(state) {					
+			case sys_INACTIVE:				
+				// initialize system
 				SystemInit();				
 				break;
 			
-			case sys_RUNNING:
+			case sys_INIT:
+				// start system
 				SystemStart();				
 				break;
 			
 			case sys_STOP:
-				//stop running system
+				// stop running system
 				running = false;
 				break;
 			

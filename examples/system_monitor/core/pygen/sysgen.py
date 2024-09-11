@@ -16,7 +16,12 @@ def init_task(tasks):
         print("Error: no init function found")
         return 0
 
+    if tasks['taskdeinit'] == '':
+        print("Error: no deinit function found")
+        return 0
+    
     hpp_file_body += 'void SystemInitTasks(void);\n'    
+    hpp_file_body += 'void SystemDeInitTasks(void);\n'    
     hpp_file_body += '\n'
 
 
@@ -26,6 +31,10 @@ def init_task(tasks):
     cpp_file_body += ' */\n'
     cpp_file_body += 'void SystemInitTasks(void) {\n'    
     cpp_file_body += '  ' + tasks['taskinit']['call'] +'();\n' 
+    cpp_file_body += '#ifdef ENABLE_SYS_TIMER\n'
+    cpp_file_body += 'time_elapsed = 0;\n'
+    cpp_file_body += 'max_time_elapsed = 0;\n'
+    cpp_file_body += '#endif //ENABLE_SYS_TIMER\n'
     cpp_file_body += '}\n'
     cpp_file_body += '\n'
     cpp_file_body += '\n'
@@ -38,18 +47,25 @@ def rt_tasks(tasks):
     global hpp_file_body
     global cpp_file_body
 
-    #print(tasks['tasks'])
-    length = len(tasks['rt-tasks'])       
-
-    #check if there is rt-tasks function if not then return 
-    if tasks['rt-tasks'] == '':
-        print("Error: no rt tasks found")
+    
+    if('rt-tasks' in tasks):
+        length = len(tasks['rt-tasks'])
+    else:
+        hpp_file_body += '#define SYS_TASKS_NUM_OF_THREADS  0\n'
         return 0
-
-    hpp_file_body += 'void SystemTask0(void);\n'
-    num_of_tasks = 1
+    
+    #check if there is rt-tasks function if not then return
+    if tasks['rt-tasks'] == '':
+        print("Warning: no rt tasks found")
+        return 0
+    
+    #initialize number fo tasks
+    num_of_tasks = 0
     
     for x in range(length):
+        if('task0' in tasks['rt-tasks'][x]): 
+            hpp_file_body += 'void SystemTask0(void);\n'
+            num_of_tasks = 1            
         if('task1' in tasks['rt-tasks'][x]): 
             hpp_file_body += 'void SystemTask1(void);\n'
             num_of_tasks = 2
@@ -79,7 +95,8 @@ def rt_tasks(tasks):
     cpp_file_body += '   UpdateTimer(&tmr1);\n'
     cpp_file_body += '#endif //ENABLE_SYS_TIMER\n'
     cpp_file_body += '   // 1x calls go here\n'
-    #10ms calls
+    
+    #1x calls
     #########  10ms calls
     for x in range(length):
         if('task0' in tasks['rt-tasks'][x]):                                    
@@ -87,10 +104,11 @@ def rt_tasks(tasks):
                 cpp_file_body += '   ' + tasks['rt-tasks'][x]['task0'] + '();\n'                                  
     ############################
     cpp_file_body += '\n'
-    # 20 ms calls
+    
+    # 2x calls
     cpp_file_body += '   if ((thread0_ctr % 2) == 0) {\n'
-    cpp_file_body += '       // 2x calls go here\n'
-    #########  20ms calls
+    cpp_file_body += '       // 2x calls go here\n'    
+    #########  2x calls
     for x in range(length):
         if('task0' in tasks['rt-tasks'][x]):                                    
             if(tasks['rt-tasks'][x]['rate'] == '2'):
@@ -98,7 +116,20 @@ def rt_tasks(tasks):
     ############################
     cpp_file_body += '   }\n' 
     cpp_file_body += '\n'
-    # 100 ms calls
+    
+    # 5x calls
+    cpp_file_body += '   if ((thread0_ctr % 5) == 0) {\n'
+    cpp_file_body += '       // 5x calls go here\n'    
+    #########  5x calls
+    for x in range(length):
+        if('task0' in tasks['rt-tasks'][x]):                                    
+            if(tasks['rt-tasks'][x]['rate'] == '5'):
+                cpp_file_body += '   ' + tasks['rt-tasks'][x]['task0'] + '();\n'                                  
+    ############################
+    cpp_file_body += '   }\n' 
+    cpp_file_body += '\n'    
+    
+    # 10x calls
     cpp_file_body += '    if (((thread0_ctr - 2) % 10) == 0) {\n'
     cpp_file_body += '       // 10x calls go here\n'
     #########  100ms calls
@@ -109,16 +140,44 @@ def rt_tasks(tasks):
     ############################
     cpp_file_body += '   }\n' 
     cpp_file_body += '\n'
-    # 1000 ms calls
+
+
+    # 20x calls
+    cpp_file_body += '    if (((thread0_ctr - 2) % 20) == 0) {\n'
+    cpp_file_body += '       // 10x calls go here\n'
+    #########  20x calls
+    for x in range(length):
+        if('task0' in tasks['rt-tasks'][x]):                                    
+            if(tasks['rt-tasks'][x]['rate'] == '20'):
+                cpp_file_body += '   ' + tasks['rt-tasks'][x]['task0'] + '();\n'                                  
+    ############################
+    cpp_file_body += '   }\n' 
+    cpp_file_body += '\n'
+    
+    # 50x calls
+    cpp_file_body += '    if (((thread0_ctr - 2) % 50) == 0) {\n'
+    cpp_file_body += '       // 50x calls go here\n'
+    #########  100ms calls
+    for x in range(length):
+        if('task0' in tasks['rt-tasks'][x]):                                    
+            if(tasks['rt-tasks'][x]['rate'] == '50'):
+                cpp_file_body += '   ' + tasks['rt-tasks'][x]['task0'] + '();\n'                                  
+    ############################
+    cpp_file_body += '   }\n' 
+    cpp_file_body += '\n'
+    
+    
+    # 100x calls
     cpp_file_body += '    if (((thread0_ctr - 3) % 100) == 0) {\n'
     cpp_file_body += '       // 100x calls go here\n'
-    #########  1000ms calls
+    #########  100x calls
     for x in range(length):
         if('task0' in tasks['rt-tasks'][x]):                                    
             if(tasks['rt-tasks'][x]['rate'] == '100'):
                 cpp_file_body += '   ' + tasks['rt-tasks'][x]['task0'] + '();\n'                                  
     ############################
     cpp_file_body += '   }\n'     
+    
     
     cpp_file_body += '   // Initial loop executes when the TaskLoopCount is 0\n'
     cpp_file_body += '   if (thread0_ctr >= 9999)\n'
@@ -132,7 +191,11 @@ def rt_tasks(tasks):
     cpp_file_body += '#ifdef ENABLE_SYS_TIMER\n'
     cpp_file_body += '   UpdateTimer(&tmr2);\n'    
     cpp_file_body += '   time_elapsed = GetTimeElapsedUs(&tmr1, &tmr2);\n'
+    cpp_file_body += '   if (time_elapsed > max_time_elapsed) {\n'
+    cpp_file_body += '      max_time_elapsed = time_elapsed;\n'
+    cpp_file_body += '   }\n'
     cpp_file_body += '   DebugLog(time_elapsed, "total time in micros: ");\n'
+    cpp_file_body += '   DebugLog(max_time_elapsed, "max time elapsed: ");\n'
     cpp_file_body += '#endif //ENABLE_SYS_TIMER\n'
     cpp_file_body += '\n'
     cpp_file_body += '}\n'
@@ -462,7 +525,6 @@ def rt_tasks(tasks):
         cpp_file_body += '}\n'
         ##################### End Task 4 ########################
     
-        
 
     
 
@@ -471,27 +533,28 @@ def nrt_tasks(tasks):
     global hpp_file_body
     global cpp_file_body
 
-    if('tasnrt-tasksk0' in tasks): 
-        length = len(tasks['nrt-tasks'])   
+    if('nrt-tasks' in tasks):
+        length = len(tasks['nrt-tasks'])
     else:
+        hpp_file_body += '#define SYS_NUM_OF_NRT_THREADS_  0\n'
         return 0
 
-    #check if there is nrt-tasks function if not then return 
+    #check if there is nrt-tasks function if not then return
     if tasks['nrt-tasks'] == '':
-        print("Error: no nrt tasks found")
+        print("Warning: no nrt tasks found")
         return 0
     
     for x in range(length):
-        if('task0' in tasks['nrt-tasks'][x]): 
+        if('task0' in tasks['nrt-tasks'][x]):
             hpp_file_body += 'void NrtSystemTask0(void);\n'
             num_of_tasks = 1
-        if('task1' in tasks['nrt-tasks'][x]): 
+        if('task1' in tasks['nrt-tasks'][x]):
             hpp_file_body += 'void NrtSystemTask1(void);\n'
             num_of_tasks = 2
-        if('task2' in tasks['nrt-tasks'][x]): 
+        if('task2' in tasks['nrt-tasks'][x]):
             hpp_file_body += 'void NrtSystemTask2(void);\n'
             num_of_tasks = 3
-        if('task3' in tasks['nrt-tasks'][x]): 
+        if('task3' in tasks['nrt-tasks'][x]):
             hpp_file_body += 'void NrtSystemTask3(void);\n'
             num_of_tasks = 4
 
@@ -528,8 +591,27 @@ def nrt_tasks(tasks):
                 cpp_file_body += '   ' + tasks['nrt-tasks'][x]['task1'] + '();\n'   
         cpp_file_body += '}\n'
 
+
+
+    
     return 1
 
+def deinit():        
+    
+    global hpp_file_body
+    global cpp_file_body
+    
+    ##################### Deinir Task ########################
+    cpp_file_body += '/**\n'
+    cpp_file_body += ' * DeInit tasks\n'
+    cpp_file_body += ' * DeInitialize system tasks\n'
+    cpp_file_body += ' */\n'
+    cpp_file_body += 'void SystemDeInitTasks(void) {\n'    
+    cpp_file_body += '  ' + tasks['taskdeinit']['call'] +'();\n' 
+    cpp_file_body += '}\n'
+    cpp_file_body += '\n'
+    cpp_file_body += '\n'
+    
 
 if __name__=="__main__":
 
@@ -566,13 +648,15 @@ if __name__=="__main__":
     cpp_file_body += '\n'
     cpp_file_body += '#ifdef ENABLE_SYS_TIMER\n'
     cpp_file_body += 'struct timespec tmr1, tmr2;\n'    
-    cpp_file_body += 'double time_elapsed;\n'
+    cpp_file_body += 'double time_elapsed, max_time_elapsed;\n'
     cpp_file_body += '#endif //ENABLE_SYS_TIMER\n'
     cpp_file_body += '\n'
 
     init_task(tasks)
     rt_tasks(tasks)        
     nrt_tasks(tasks)
+    deinit()
+
 
     #end hpp file
     hpp_file_body += '#endif //SYSTASKS_HPP_ \n'

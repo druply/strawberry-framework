@@ -3,7 +3,7 @@
 
 #define     MAIN_CYCLE_nS   10000000.00  // 10ms
 
-#define  ENABLE_DEBUG_LOGGER
+
 #define  ENABLE_SYS_LOGGER
 
 

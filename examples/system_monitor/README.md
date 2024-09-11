@@ -1,57 +1,68 @@
-#system monitor example
+# strawberry-framework
 
-This example show how to monitor the system and how to set a fault to stop the system.
+**Strawberry Framework** is a tool that helps you deploy your appplications in ARM processors running linux, especially if you want to run your application in real time in a raspberry pi for example. This tool is the perfect solution to help you speed up your deployment.
 
-see app/src/app_swc1.cpp
+## Adding code to your project
+
+add code to the app/src/app_swc1.cpp
 This file contains the following:
 
-static int ctr = 0, ctr2 = 0;
-ctr++;
+app_swc1_init:  Init function, this is called when the system is initialized, add your initialization code here.
+rte_input_swc1: input reading, this funciton can be used to read signal from your lower layers(services, drivers)
+rte_output_swc1: output writing, this funciton can be used to write output to yoru lower layers(services, drivers)
+app_swc1: this is the main funciton for your app
+app_swc1_deinit: this function is called when the system is deinitialized
 
-if(ctr == 150) {
-    except = sys_Restart;
-    SetSystemException(except);
-    ctr = 0;
-    ctr2++;
-
-    if(ctr2 == 10) {
-        except = sys_Taskoverrun;
-        SetSystemException(except);
-    }
-}
-
-this app has two counters, one is increased every cycle.
-the system is configured to run every 10ms
-
-so every 1.5s the condition will be met, and the system will be set to restart.
-
-once 10 restarts have happened then the system will set a fault "sys_Taskoverrun"  this will stop the system.
+You are welcome to add more app source files, just make sure the source files are inside the app/src folder.
+and specify your prototype functions inside the app/inc/app_swc.hpp file.
 
 
-##Configuring project
+add code to device/ folder
+In this folder you can add your drivers and services for the application you are developing
 
-The system is configure to run every 10ms as base time
-sys_logger is enabled for both system and debug.
-sys_timer is disabled since we are not measuring the runtime.
 
-{
-    "base-time" : "10",
+## Configuring project
+
+**taskinit** specifies the function that initialized your system, specify the name of your funciton the "call" and the header where it is located in "header" ad shown in the example.
+
+"taskinit": {
+    "call" : "InitEcu",
+    "header" : "Ecu.hpp"
+        
+},
     
-    "sys-logger" : {
-        "debug" : "on",
-        "system" : "on"
-    },
-    "sys-timer" : "off"    
-}
+**rt-tasks** specifies the real time tasks, specify the number of the task, the name and the rate
+The following example defines two tasks task0 and task1 that will run in two different threads.
+**task0** contains two functions that will be called, "usonicsDrv" will be called every 1x the base time, "encodersDrv" will be called every 2x the base time
+**task1** contains two functions that will be called, "lidarDrv" will be called every 2x the base time, "cameraDrv" will be called every 5x the base time
 
-##to generate project:
+"rt-tasks": [
+    {
+        "task0" : "usonicsDrv",
+        "rate" :  "1"            
+    },
+    {
+        "task0" : "encodersDrv",
+        "rate" :  "2"            
+    },
+    {
+        "task1" : "lidarDrv",
+        "rate" :  "2"            
+    },
+    {
+        "task1" : "cameraDrv",
+        "rate" :  "5"            
+    }
+]
+    
+## to generate project:
 
 **Execute the command**
 sh generate.sh
 
 This will generate the project using the configuration in the tasks.json file
 
-##to build project:
+## to build project:
 
 mkdir build
 cd build
@@ -60,13 +71,13 @@ make
 ./strawberry
 
 
-##For release code:
+## For release code:
 mkdir Release
 cd Release
 cmake -DCMAKE_BUILD_TYPE=Release ..
 make
 
-##for debug code:
+## for debug code:
 mkdir Debug
 cd Debug
 cmake -DCMAKE_BUILD_TYPE=Debug ..

@@ -6,8 +6,7 @@
  */
 
 #include <time.h>
-//#include <thread>
-#include <pthread.h>
+#include <thread>
 #include <mutex>
 #include <chrono>
 
@@ -27,47 +26,7 @@ void OsInit(void) {
 }
 
 
-static void * Thread0(void *arguments) {
-	double loop_time = 0.0;
-	double previous_loop = 0.0;
-
-	UpdateTimer(&rt_loop);
-	previous_loop = (rt_loop.tv_sec) * 1e9 + (rt_loop.tv_nsec);
-	system_state_T os_state = sys_RUNNING;
-	system_exception_T exception = sys_Taskdelayed;
-
-	GetSystemState(&os_state);
-
-	do {
-		// get current clock timestamp
-		UpdateTimer(&rt_loop);
-
-		// get time difference betwee current timesampt and previous timestamp
-		loop_time = (rt_loop.tv_sec) * 1e9 + (rt_loop.tv_nsec);
-		loop_time = loop_time - previous_loop;
-
-		// if difference is greater than 10ms then execute real time simulator
-		if (loop_time>=MAIN_CYCLE_nS) {
-
-			// if execution took more than 50% of main cycle time then set an exception
-		  if(loop_time > (MAIN_CYCLE_nS*1.5)) {
-				SetSystemException(exception);
-		  }
-		  // get clock timestamp
-		  UpdateTimer(&rt_loop);
-		  //update previous loop time
-	      previous_loop = (rt_loop.tv_sec) * 1e9 + (rt_loop.tv_nsec);
-
-		  // call real time simulator
-		  SystemTask0();
-		  SystemMonitor();
-
-		 }
-		GetSystemState(&os_state);
-	} while(os_state == sys_RUNNING);
-}
-
-static void * Thread1(void *arguments) {
+static void Thread1(void) {
 	double loop_time = 0.0;
 	double previous_loop = 0.0;
 
@@ -107,7 +66,7 @@ static void * Thread1(void *arguments) {
 	} while(os_state == sys_RUNNING);
 }
 
-static void * Thread2(void *arguments) {
+static void Thread2(void) {
 	double loop_time = 0.0;
 	double previous_loop = 0.0;
 
@@ -142,7 +101,7 @@ static void * Thread2(void *arguments) {
 }
 
 
-static void * Thread3(void *arguments) {
+static void Thread3(void) {
 
 	double loop_time = 0.0;
 	double previous_loop = 0.0;
@@ -218,53 +177,36 @@ static void TmpThread1(void) {
 }
 
 void OsStart(void) {
-	// double loop_time = 0.0;
-	// double previous_loop = 0.0;
+	double loop_time = 0.0;
+	double previous_loop = 0.0;
 
-	// UpdateTimer(&rt_loop);
-	// previous_loop = (rt_loop.tv_sec) * 1e9 + (rt_loop.tv_nsec);
-	// system_state_T os_state = sys_RUNNING;
-	// system_exception_T exception = sys_Taskdelayed;
+	UpdateTimer(&rt_loop);
+	previous_loop = (rt_loop.tv_sec) * 1e9 + (rt_loop.tv_nsec);
+	system_state_T os_state = sys_RUNNING;
+	system_exception_T exception = sys_Taskdelayed;
 
-	// GetSystemState(&os_state);
+	GetSystemState(&os_state);
 
 	//start threads
-
-	#if SYS_TASKS_NUM_OF_THREADS > 0
-	//std::thread thread1(Thread1);
-	//thread1.detach();
-	pthread_t thread0;
-	pthread_create(&thread0, NULL, Thread0, NULL);
-	#endif
-
 	#if SYS_TASKS_NUM_OF_THREADS > 1
-	//std::thread thread1(Thread1);
-	//thread1.detach();
-	pthread_t thread1;
-	pthread_create(&thread1, NULL, Thread1, NULL);
-
+	std::thread thread1(Thread1);
+	thread1.detach();
 	#endif
 
 	#if SYS_TASKS_NUM_OF_THREADS > 2
-	//std::thread thread2(Thread2);
-	//thread2.detach();
-	pthread_t thread2;
-	pthread_create(&thread2, NULL, Thread2, NULL);
+	std::thread thread2(Thread2);
+	thread2.detach();
 	#endif
 
 	#if SYS_TASKS_NUM_OF_THREADS > 3
-	//std::thread thread3(Thread3);
-	//thread3.detach();
-	pthread_t thread3;
-	pthread_create(&thread3, NULL, Thread3, NULL);
+	std::thread thread3(Thread3);
+	thread3.detach();
 	#endif
 
 
 	#if SYS_NUM_OF_NRT_THREADS_ > 0
-	//std::thread thread10(NrtThread0);
-	//thread10.detach();
-	pthread_t thread10;
-	pthread_create(&thread10, NULL, NrtThread0, NULL);
+	std::thread thread10(NrtThread0);
+	thread10.detach();
 	#endif
 
 	#if SYS_NUM_OF_NRT_THREADS_ > 1
@@ -282,50 +224,32 @@ void OsStart(void) {
 	thread21.detach();
 	#endif
 
+	do {
+		// get current clock timestamp
+		UpdateTimer(&rt_loop);
 
+		// get time difference betwee current timesampt and previous timestamp
+		loop_time = (rt_loop.tv_sec) * 1e9 + (rt_loop.tv_nsec);
+		loop_time = loop_time - previous_loop;
 
-	#if SYS_TASKS_NUM_OF_THREADS > 0
-	pthread_join(thread0, NULL);
-	#endif
+		// if difference is greater than 10ms then execute real time simulator
+		if (loop_time>=MAIN_CYCLE_nS) {
 
-	#if SYS_TASKS_NUM_OF_THREADS > 1
-	pthread_join(thread1, NULL);
-	#endif
+			// if execution took more than 50% of main cycle time then set an exception
+		  if(loop_time > (MAIN_CYCLE_nS*1.5)) {
+				SetSystemException(exception);
+		  }
+		  // get clock timestamp
+		  UpdateTimer(&rt_loop);
+		  //update previous loop time
+	      previous_loop = (rt_loop.tv_sec) * 1e9 + (rt_loop.tv_nsec);
 
-	#if SYS_TASKS_NUM_OF_THREADS > 2
-	pthread_join(thread2, NULL);
-	#endif
+		  // call real time simulator
+		  SystemTask0();
+		  SystemMonitor();
 
-	#if SYS_NUM_OF_NRT_THREADS_ > 0
-	pthread_join(thread10, NULL);
-	#endif
-
-	// do {
-	// 	// get current clock timestamp
-	// 	UpdateTimer(&rt_loop);
-
-	// 	// get time difference betwee current timesampt and previous timestamp
-	// 	loop_time = (rt_loop.tv_sec) * 1e9 + (rt_loop.tv_nsec);
-	// 	loop_time = loop_time - previous_loop;
-
-	// 	// if difference is greater than 10ms then execute real time simulator
-	// 	if (loop_time>=MAIN_CYCLE_nS) {
-
-	// 		// if execution took more than 50% of main cycle time then set an exception
-	// 	  if(loop_time > (MAIN_CYCLE_nS*1.5)) {
-	// 			SetSystemException(exception);
-	// 	  }
-	// 	  // get clock timestamp
-	// 	  UpdateTimer(&rt_loop);
-	// 	  //update previous loop time
-	//       previous_loop = (rt_loop.tv_sec) * 1e9 + (rt_loop.tv_nsec);
-
-	// 	  // call real time simulator
-	// 	  SystemTask0();
-	// 	  SystemMonitor();
-
-	// 	 }
-	// 	GetSystemState(&os_state);
-	// } while(os_state == sys_RUNNING);
+		 }
+		GetSystemState(&os_state);
+	} while(os_state == sys_RUNNING);
 
 }
