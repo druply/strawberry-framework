@@ -36,3 +36,4 @@ build/
 Release/
 Debug/
 gen/
+**/.DS_Store
