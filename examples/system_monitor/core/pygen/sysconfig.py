@@ -11,7 +11,13 @@ def add_sys_cfg(config):
     sys_logger = config["sys-logger"]["system"]
     sys_timer = config["sys-timer"]
 
-    if (base_time == "10"):
+    if (base_time == "1"):
+        hpp_cfg_file_body += '#define     MAIN_CYCLE_nS    1000000.00  //  1ms\n'
+
+    elif (base_time == "5"):
+        hpp_cfg_file_body += '#define     MAIN_CYCLE_nS    5000000.00  //  5ms\n'
+
+    elif (base_time == "10"):
         hpp_cfg_file_body += '#define     MAIN_CYCLE_nS   10000000.00  // 10ms\n'
 
     elif (base_time == "20"):
@@ -25,7 +31,7 @@ def add_sys_cfg(config):
 
     else:
         print("invalid configuration for base-time.")
-        print("valid values are: 10, 20, 50, 100")
+        print("valid values are: 1, 5, 10, 20, 50, 100")
 
     hpp_cfg_file_body += '\n' 
 
