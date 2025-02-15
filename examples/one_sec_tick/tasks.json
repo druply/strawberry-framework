@@ -1,0 +1,17 @@
+{
+    "taskinit": {
+        "call" : "app_swc1_init",
+        "header" : "app_swc.hpp"
+        
+    },
+    "taskdeinit": {
+        "call" : "app_swc1_deinit",
+        "header" : "app_swc.hpp"
+    }, 
+
+    "rt-tasks": [
+    {
+            "task0" : "AppSwc1",
+            "rate" :  "1"            
+    }]
+}
