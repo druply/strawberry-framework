@@ -1,4 +1,5 @@
 #pragma once
+
 #include <thread>
 #include <chrono>
 #include <vector>
@@ -7,18 +8,14 @@
 /*
   Structure for tasks
 */
-
 template <typename T>
 void newThread(void (*fptr)(int), T value) {
 	int ctr = 0;
 	while(ctr<20) {
 		auto start = std::chrono::high_resolution_clock::now();
 		ctr++;
-		//mtx.lock();
-	
-		//		std::cout << "task: " << value << " ms" << std::endl;
+
 		fptr(value);
-		//mtx.unlock();
 					
 		auto end = std::chrono::high_resolution_clock::now();	
 		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - 

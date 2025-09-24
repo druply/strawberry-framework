@@ -1,26 +1,4 @@
-
-
 #include "mirtos.hpp"
-
-/*
-class Task {
-	void (*fptr)();
-	int l_cycle;
-	std::string l_name;
-	int l_type;
-	
-public:
-	Task(void (*func)(), std::string name, int cycle, int type);
-};
-
-Task::Task(void (*func)(), std::string name, int cycle, int type):
-	l_name(name), l_cycle(cycle), l_type(type) {
-
-	std::cout << "constructor" << std::endl;
-	fptr = func;
-}
-*/
-
 
 std::vector<Task_T> tasks;
 
