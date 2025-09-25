@@ -1,6 +1,6 @@
 
 #include "strawberry_private.hpp"
-//#include "strawberry.hpp"
+
 
 // vector of tasks to be executed
 std::vector<Task_T> tasks;
@@ -12,7 +12,7 @@ SysState sys_state_local;
  Create a task and
  add it to the vector
 */
-void createTask(void (*func)(TaskParams_T*), std::string name_tmp, int cycle_tmp, int type_tmp) {
+void createTask(void (*func)(task_params_t*), std::string name_tmp, int cycle_tmp, task_type_t type_tmp) {
 
 	// create a temporary structure task
 	Task_T task_tmp;
@@ -44,9 +44,24 @@ void startScheduler(void) {
 	sys_state_local = SysState::Running;
 	
 	// assign the functions to be executed to the threads
-	for (auto i : tasks) {
-		//i.fptr(i.cycle);
-		threads[x++] = std::thread(newThread<TaskParams_T>, i.fptr, i.params);
+	for (auto tsk : tasks) {
+
+		switch(tsk.params.type) {
+		
+			case task_type_t::Cyclic:
+			threads[x++] = std::thread(newCyclicThread<task_params_t>, tsk.fptr, tsk.params);
+			break;
+			
+			case task_type_t::OneTime:
+			break;
+			
+			case task_type_t::NonCyclic:
+			break;
+			
+			default:
+			break;
+		};
+		
 
 	}
 	

@@ -13,19 +13,10 @@
   Structure for tasks
 */
 typedef struct {
-	void (*fptr)(TaskParams_T*);
-	TaskParams_T params;
+	void (*fptr)(task_params_t*);
+	task_params_t params;
 } Task_T;
 
-/*
-class enum for
-the types of tasks
-*/
-enum class TaskType {
-	Cyclic,
-	OneTime,
-	NonCyclic
-};
 
 /*
 class enum for
@@ -50,7 +41,7 @@ void stopScheduler(void);
  Task function template
 */
 template <typename T>
-void newThread(void (*fptr)(TaskParams_T*), T parameters) {
+void newCyclicThread(void (*fptr)(task_params_t*), T parameters) {
 	//local variable to monitor system state
 	SysState sys_state;
 	
