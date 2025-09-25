@@ -20,11 +20,11 @@ void createTask(void (*func)(TaskParams_T*), std::string name_tmp, int cycle_tmp
 	//assign the function to be executed
 	task_tmp.fptr = func;
 	//assigne the cycle at which it will run
-	task_tmp.cycle = cycle_tmp;
+	task_tmp.params.cycle = cycle_tmp;
 	// name of the function
-	task_tmp.name = name_tmp;
+	task_tmp.params.name = name_tmp;
 	// type of task to be executed
-	task_tmp.type = type_tmp;		
+	task_tmp.params.type = type_tmp;		
 
 	// add task to the vector
 	tasks.push_back(task_tmp);	
@@ -45,10 +45,6 @@ void startScheduler(void) {
 	
 	// assign the functions to be executed to the threads
 	for (auto i : tasks) {
-		
-		i.params.cycle = i.cycle;
-		i.params.name = i.name;
-		i.params.type = i.type;
 		//i.fptr(i.cycle);
 		threads[x++] = std::thread(newThread<TaskParams_T>, i.fptr, i.params);
 
@@ -67,4 +63,13 @@ Get thecurrent system state
 static SysState getTaskState() {
 	return sys_state_local;
 }
+
+/*
+Stop scheduler
+*/
+void stopScheduler(void) {
+	// set system state to stopped
+	sys_state_local = SysState::Stopped;
+}
+
 

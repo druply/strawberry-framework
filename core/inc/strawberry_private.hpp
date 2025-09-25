@@ -7,16 +7,13 @@
 #include <mutex>
 #include "strawberry.hpp"
 
-
+#include <iostream>
 
 /*
   Structure for tasks
 */
 typedef struct {
 	void (*fptr)(TaskParams_T*);
-	int cycle;
-	std::string name;
-	int type;
 	TaskParams_T params;
 } Task_T;
 
@@ -44,6 +41,10 @@ std::mutex mtx_local;
 
 //prototype for function
 static SysState getTaskState();
+
+// prototype to stop system
+void stopScheduler(void);
+
 
 /*
  Task function template
@@ -74,8 +75,18 @@ void newThread(void (*fptr)(TaskParams_T*), T parameters) {
 		//calculate the duration of this function execution time
 		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - 
 		start);	
+		
+		// if excution time is greater than cycle time the thow exception
+		if(std::chrono::milliseconds(parameters.cycle) < duration) {
+			stopScheduler();
+			throw std::runtime_error("Runtime is bigger than cycle time in task: " + parameters.name);
+
+		}
+
 		//calculate sleep time to accomplish real time
 		auto sleep_tmp = (std::chrono::milliseconds(parameters.cycle) - duration);	
+
+		
 		//unlock mutex
 		mtx_local.unlock();
 			
@@ -83,9 +94,14 @@ void newThread(void (*fptr)(TaskParams_T*), T parameters) {
 		try {
 			std::this_thread::sleep_for(sleep_tmp);
 		}
-			
+
+		// catch exceptions
+		catch(std::runtime_error &ex) {
+			std::cout <<  ex.what() << std::endl;
+		}
+					
 		catch(std::exception &ex) {
-			
+			std::cout <<  ex.what() << std::endl;
 		}
 		
 	}
