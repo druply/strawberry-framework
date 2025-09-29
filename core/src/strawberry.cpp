@@ -1,6 +1,8 @@
 
 #include "strawberry_private.hpp"
+#include <iostream>
 
+namespace strawberry {
 
 // vector of tasks to be executed
 std::vector<Task_T> tasks;
@@ -48,7 +50,7 @@ void startScheduler(void) {
 
 		switch(tsk.params.type) {
 		
-			case task_type_t::Cyclic:
+			case task_type_t::Cyclic:			
 			threads[x++] = std::thread(newCyclicThread<task_params_t>, tsk.fptr, tsk.params);
 			break;
 			
@@ -88,3 +90,4 @@ void stopScheduler(void) {
 }
 
 
+}

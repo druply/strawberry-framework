@@ -1,6 +1,7 @@
 #pragma once
 
 
+namespace strawberry {
 /*
 class enum for
 the types of tasks
@@ -25,3 +26,4 @@ typedef struct {
 void createTask(void (*func)(task_params_t*), std::string name_tmp, int cycle_tmp, task_type_t type_tmp);
 void startScheduler(void);
 
+}

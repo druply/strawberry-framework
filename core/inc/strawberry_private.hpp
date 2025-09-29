@@ -9,6 +9,8 @@
 
 #include <iostream>
 
+namespace strawberry {
+
 /*
   Structure for tasks
 */
@@ -43,7 +45,7 @@ void stopScheduler(void);
 template <typename T>
 void newCyclicThread(void (*fptr)(task_params_t*), T parameters) {
 	//local variable to monitor system state
-	SysState sys_state;
+	SysState sys_state = SysState::Running;
 	
 	//enter an infinite loop as long as system is running
 	while(sys_state == SysState::Running) {
@@ -98,3 +100,4 @@ void newCyclicThread(void (*fptr)(task_params_t*), T parameters) {
 	}
 }
 
+}
